@@ -1,3 +1,4 @@
+# Reproducible randomness
 set.seed(191919)
 
 source("functions.R")
