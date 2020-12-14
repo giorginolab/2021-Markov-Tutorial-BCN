@@ -42,6 +42,8 @@ Note how the row sum to unity (conservation of probability).
 
 For the sake of illustration, we work with the first ("weather") example.
 
+![weather](img/weather.png)
+
 
 ## Sampling the chain
 
