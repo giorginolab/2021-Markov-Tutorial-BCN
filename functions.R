@@ -1,16 +1,16 @@
 
 # Remove imaginary part if small
-unIm <- function(x) {
+dropSmallImaginary <- function(x) {
         if (all(Im(z <- zapsmall(x))==0)) as.numeric(z) else x
 }
 
 # Extract stationary state as eigenvector of eigenvalue=1
 sstate <- function(M) {
         ev<-eigen(t(M))
-        if(unIm(ev$values[1]) != 1) 
+        if(dropSmallImaginary(ev$values[1]) != 1) 
                 stop("First EV not 1")
         ss <- ev$vectors[,1] / sum(ev$vectors[,1])
-        unIm(ss)
+        dropSmallImaginary(ss)
 }
 
 # Sample a Markov chain 

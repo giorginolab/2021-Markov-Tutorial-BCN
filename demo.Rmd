@@ -38,7 +38,8 @@ colortrajP <- matrix( c(3/5,  0,  2/5,
                       nrow = 3, byrow = T)
 ```
 
-Note how the row sum to unity (conservation of probability).
+Note how the rows sum to unity (conservation of probability): the state must
+go somewhere.
 
 For the sake of illustration, we work with the first ("weather") example.
 
@@ -59,13 +60,14 @@ sample.markov(P, 30)
 ```
 
 
-Question: if we play the game a very longtime, how much time would we spend in each state?
+## Stationary state
+
+
+Question: if we play the game a very long time, what fraction of time would we spend in each state?
 
 * That is the asymptotic (equilibrium) distribution.
 * I.e., the probability of finding the system in a given state.
 
-
-## Stationary state
 
 ```{r}
 # Check the stationary state by extracting 1000 samples
@@ -79,7 +81,7 @@ realization. The power of the Markov formalism lies
 in the fact that such quantities can be computed from
 the matrix *P* right away. For example,
 the stationary distribution is computed
-from the first eigenvector (see functions).
+from the first eigenvector (see function `sstate`).
 
 ```{r}
 ss <- sstate(P)
@@ -87,7 +89,7 @@ print(ss)
 ```
 
 The exact estimate approximates well the samples.
-We may represent these counts graphically.
+We represent both graphically.
 
 ```{r}
 plot(table(sN), xlab="State", ylab="Times visited")
@@ -95,6 +97,25 @@ plot(table(sN), xlab="State", ylab="Times visited")
 # Compare with the theory
 points(1:3, N*ss, col=2)
 ```
+
+Stationary probabilities can be converted readily
+into free energy differences (ΔG), up to an
+irrelevant additive constant. Assuming *T* = 298 K,
+
+```{r}
+kB <- 0.001985875    # kcal/mol/K
+dG <- kB * 298 * log(ss)
+dG
+```
+
+in units of kcal/mol. It is convenient to set the lowest-energy 
+state (the most stable) to 0 kcal/mol.
+
+```{r}
+dG-min(dG)
+```
+
+
 
 
 ## Probability distributions
