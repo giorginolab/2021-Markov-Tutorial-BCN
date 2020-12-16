@@ -1,7 +1,10 @@
 ---
 title: "Simple demonstration of discrete Markov processes"
 author: "Toni Giorgino (CNR-IBF)"
-output: html_document
+output: 
+        html_document:
+                toc: true
+                toc_float: true
 ---
 
 ```{r setup, include=FALSE}
@@ -104,7 +107,7 @@ irrelevant additive constant. Assuming *T* = 298 K,
 
 ```{r}
 kB <- 0.001985875    # kcal/mol/K
-dG <- kB * 298 * log(ss)
+dG <- -kB * 298 * log(ss)
 dG
 ```
 
@@ -118,7 +121,88 @@ dG-min(dG)
 
 
 
-## Probability distributions
+## Recover the transition count matrix from a sequence
+
+Here we do the reverse than before: instead of
+using the transition probability matrix to sample a sequence,
+we now use a sequence to recover the transition count matrix
+(later I'll normalize it to get a transition *probability* matrix).
+
+Technically, I use a trick: I prepare a data frame with one 
+column (I) holding the sampled values, and another
+(J) holding the same values lagged by  1 time
+step. So, I can just count the I,J pairs (with the
+`table` function).
+
+```{r}
+library(zoo)
+dij <- data.frame(i = sN,
+                  j = lag(zoo(sN), 1, na.pad=T))
+dij <- na.omit(dij)  # The very last transition is not valid
+
+T <- table(dij)
+addmargins(T)
+```
+
+Now normalize by rows. Note how close it is to the
+original matrix.
+
+```{r}
+estP <- T/rowSums(T)
+estP
+```
+
+
+
+## Markovianity
+
+The sequence of states that we sampled is markovian
+**by construction**. However, in general (for real-world timeseries)
+this is not a given.
+
+To test markovianity, I will counts the transitions I->J but
+this time considering separately whether they were preceded by 
+K = 1, 2 or 3. In other words, I will count  occurrences of these
+sequences: 1-I-J,  2-I-J, 3-I-J.
+
+Remember that the Markov property reads:
+
+$$ p(s_t | s_{t-1}, s_{t-2}, \dots ) = p(s_t | s_{t-1} ) $$
+in our case, J is the destination state $s_t$, I is $s_{t-1}$,
+and the preceeding state K is $s_{t-2}$.
+
+As above, I use lags and tabulation.
+
+```{r}
+dkij <- data.frame(k = sN,
+                   i = lag(zoo(sN), 1, na.pad=T),
+                   j = lag(zoo(sN), 2, na.pad=T))
+dkij <- na.omit(dkij)  # The very last transition is not valid
+
+print(head(dkij))
+```
+
+Probabilities should be independent from K. They will eventually be, 
+if we sample long enough.
+
+```{r}
+T3<-table(dkij)
+
+# Sequences 1-I-J, i.e. K=1
+print(T3[1,,]/rowSums(T3[1,,]))
+
+# Sequences 2-I-J, i.e. K=2
+print(T3[2,,]/rowSums(T3[2,,]))
+
+# Sequences 3-I-J, i.e. K=3
+print(T3[3,,]/rowSums(T3[3,,]))
+```
+
+
+
+
+
+## The probabilistic point of view
 
 Markov chains can also be followed stochastically,
 propagating the probability density. Again you will realize
@@ -156,3 +240,6 @@ matplot(pT, type="o",
 points(rep(10,3),ss,col=1:3)
 
 ```
+
+
+
