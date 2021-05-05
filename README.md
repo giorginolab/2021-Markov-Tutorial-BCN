@@ -1,6 +1,6 @@
 # Markov state model tutorial
 
-Toni Giorgino (IBF-CNR) for the MSI Classes of the UPF Master in Bioinformatics for Health Sciences.
+Toni Giorgino (IBF-CNR), www.giorginolab.it, for the MSI Classes of the UPF Master in Bioinformatics for Health Sciences.
 
 
 * To preview the notebook code "live" with results,  [![Open In
